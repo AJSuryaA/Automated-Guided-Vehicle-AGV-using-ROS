@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="inertial.xacro" />
+
+    <!-- MATERIAL COLOR-->
+
+    <material name= "blue">
+        <color rgba= "0 0 1 1" />
+    </material>
+    <material name= "green">
+        <color rgba= "0 1 0 1" />
+    </material>
+    <material name= "red">
+        <color rgba= "1 0 0 1" />
+    </material>
+    <material name= "black">
+        <color rgba= "0 0 0 1" />
+    </material>
+    <material name= "white">
+        <color rgba= "1 1 1 1" />
+    </material>
+    <material name= "yellow">
+        <color rgba= "1 0.9 0.2 1" />
+    </material>
+
+    <!-- common val-->
+
+    <xacro:property name="b_l" value="0.65"/>
+    <xacro:property name="b_w" value="0.45"/>
+    <xacro:property name="b_h" value="0.25"/>
+    <xacro:property name="w_r" value="0.06"/>
+    <xacro:property name="w_l" value="0.025"/>
+    <xacro:property name="c_r" value="0.0135"/>
+    <xacro:property name="c_d" value="0.027"/>
+
+    <!-- base_footprint -->
+
+    <link name="base_footprint">
+    </link>
+
+    <!-- base link -->
+
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="${b_l} ${b_w} ${b_h}" />
+            </geometry>
+            <origin xyz="0 0 ${b_h/2}" rpy="0 0 0" /> 
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${b_l} ${b_w} ${b_h}"/>
+            </geometry>
+            <origin xyz="0 0 ${b_h/2}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="5" l="${b_l}" w="${b_w}" h="${b_h}"
+            xyz="0 0 ${b_h/2}" rpy="0 0 0" /> 
+    </link>
+
+    <!-- base joint -->
+
+    <joint name = "base_joint " type = "fixed">
+        <parent link ="base_footprint" />
+        <child link ="base_link"   />
+        <origin xyz="0 0 ${c_d}" rpy="0 0 0" />
+    </joint>
+
+    <!-- base_scan 
+
+    <link name="base_scan">
+        <visual>
+            <geometry>
+                <box size="${b_l} ${b_w} ${b_h}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" /> 
+            <material name="green" />
+        </visual>
+    </link>
+
+    <joint name = "base_scan_joint " type = "fixed">
+        <parent link ="base_link" />
+        <child link ="base_scan"   />
+        <origin xyz="0 0 0.02" rpy="0 0 0" />
+    </joint> -->
+
+
+    <!-- wheel link -->
+
+    <xacro:macro name="wheel_link" params="pre" >
+        <link name="${pre}_wheel_link">
+            <visual>
+                <geometry>
+                    <cylinder radius="${w_r}" length="${w_l}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+                <material name="black" />
+            </visual> 
+            <collision>
+                <geometry>
+                    <cylinder radius="${w_r}" length="${w_l}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="1.57 0 0" />
+            </collision>
+            <xacro:cylinder_inertia m="0.1" r="${w_r}" h="${w_l}" 
+                xyz="0 0 0" rpy="1.57 0 0" />
+        </link>
+    </xacro:macro>
+    
+    <xacro:wheel_link pre="l" />
+    <xacro:wheel_link pre="r" />
+
+    <!-- wheel joint -->
+
+    <joint name = "r_wheel_joint" type = "continuous">
+        <parent link ="base_link" />
+        <child link ="r_wheel_link"   />
+        <origin xyz="0 ${(b_w/2) - w_l} ${w_r - c_d}" rpy="0 0 0" />
+        <axis xyz ="0 1 0 "  />
+    </joint>
+
+    <joint name = "l_wheel_joint" type = "continuous">
+        <parent link ="base_link" />
+        <child link ="l_wheel_link"   />
+        <origin xyz="0 ${(-b_w/2) + w_l} ${w_r - c_d}" rpy="0 0 0" />
+        <axis xyz ="0 1 0 "  />
+    </joint>
+
+    <!-- caster link -->
+
+    <xacro:macro name="caster" params="pre">
+        <link name="caster_wheel_link_${pre}">
+            <visual>
+                <geometry>
+                    <sphere radius="${c_r}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <material name="black" />
+            </visual>
+            <collision>
+                <geometry>
+                    <sphere radius="${c_r}" />
+                </geometry>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+            </collision>
+            <xacro:caster_inertia m="0.05" r="${c_r}"
+                xyz="0 0 0" rpy="0 0 0" />
+        </link>
+    </xacro:macro>
+
+    <xacro:caster pre="1" />
+    <xacro:caster pre="2" />
+    <xacro:caster pre="3" />
+    <xacro:caster pre="4" />
+
+    <!-- caster joint -->
+
+    <joint name = "caster_wheel_joint_1" type = "fixed">
+        <parent link ="base_link" />
+        <child link ="caster_wheel_link_1"   />
+        <origin xyz="0.2 0.1 -0.0135" rpy="0 0 0" />
+    </joint>
+
+    <joint name = "caster_wheel_joint_2" type = "fixed">
+        <parent link ="base_link" />
+        <child link ="caster_wheel_link_2"   />
+        <origin xyz="-0.2 0.1 -0.0135" rpy="0 0 0" />
+    </joint>
+
+    <joint name = "caster_wheel_joint_3" type = "fixed">
+        <parent link ="base_link" />
+        <child link ="caster_wheel_link_3"   />
+        <origin xyz="0.2 -0.1 -0.0135" rpy="0 0 0" />
+    </joint>
+
+    <joint name = "caster_wheel_joint_4" type = "fixed">
+        <parent link ="base_link" />
+        <child link ="caster_wheel_link_4"   />
+        <origin xyz="-0.2 -0.1 -0.0135" rpy="0 0 0" />
+    </joint>
+
+
+    
+</robot>

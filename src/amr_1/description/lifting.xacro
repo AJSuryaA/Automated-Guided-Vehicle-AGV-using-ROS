@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="inertial.xacro" />
+
+    <link name="lifting_mech_link">
+        <visual>
+            <geometry>
+                <cylinder radius="0.2" length="0.2" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="yellow" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.2" length="0.2" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="1" r="0.2" h="0.2" 
+                xyz="0 0 0" rpy="0 0 0" />
+    </link>
+
+    <joint name = "lifting_mech_joint" type = "prismatic">
+        <parent link ="chassis_link" />
+        <child link ="lifting_mech_link"   />
+        <limit effort="100" lower="0" upper="0.05" velocity="0.5"/>
+        <origin xyz="0 0 0.18" rpy="0 0 0" />
+        <axis xyz="0 0 1"/>
+    </joint>
+
+</robot>
