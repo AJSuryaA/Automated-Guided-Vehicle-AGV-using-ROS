@@ -2,3 +2,14 @@ sudo apt install ros-humble-xacro ros-humble-joint-state-publisher-gui
 
 sudo apt install ros-humble-navigantion2 ros-humble-nav2-bringup  
 
+sudo apt install python3-serial
+
+sudo apt install xacro
+
+git clone -b humble https://github.com/joshnewans/diffdrive_arduino.git
+
+git clone -b humble https://github.com/joshnewans/serial.git
+
+sudo apt remove brltty
+
+
