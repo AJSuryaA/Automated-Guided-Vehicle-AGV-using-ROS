@@ -1,0 +1,45 @@
+amrws/  ---> rviz2 -d src/amr/config/view_bot.rviz  ##view rviz
+
+ros2 run joint_state_publisher_gui joint_state_publisher_gui ## joint state pub
+
+~/amrws$ ros2 launch amr_1 launch_sim.launch.py  # world:=./src/amr/worlds/obstacles.world
+## launch gazebo
+
+~/amrws$ ros2 run teleop_twist_keyboard teleop_twist_keyboard  ## controller
+
+ros2 control list_hardware_interfaces
+
+ros2 run controller_manager spawner diff_cont
+
+ros2 run controller_manager spawner joint_broad
+
+~/amrws$ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diff_cont/cmd_vel_unstamped
+
+
+
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./src/amr/config/mapper_params_online_async.yaml use_sim_time:=true
+
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=savemap.yaml -p use_sim_time:=true
+
+ros2 run nav2_util lifecycle_bringup map_server
+
+ros2 run nav2_amcl amcl --ros-args -p use_sim_time:=true
+
+ros2 run nav2_util lifecycle_bringup amcl
+
+ros2 run twist_mux twist_mux --ros-args --params-file ./src/amr/config/twist_mux.yaml -r cmd_vel_out:=diff_cont/cmd_vel_unstamped
+
+ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true
+
+ros2 run serial_motor_demo driver --ros-args -p serial_port:=/dev/ttyACM0 -p baud_rate:=57600 -p loop_rate:=30 -p encoder_cpr:=7552
+
+ros2 run serial_motor_demo gui
+
+
+##serial motor demo
+
+miniterm -e/dev/ttyUSB0 57600
+
+
+
+
